@@ -232,6 +232,17 @@
       letter-spacing: -1px;
       line-height: 1;
       font-family: 'Overpass Mono', monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .metric-value.text-sm {
+      font-size: 13px;
+      font-family: 'Overpass', sans-serif;
+      letter-spacing: 0;
+      white-space: normal;
+      line-height: 1.4;
     }
 
     .metric-value.ok { color: var(--green); }
@@ -632,11 +643,11 @@ function renderTecnica() {
         </div>
         <div class="metric-card">
           <div class="metric-label">robots.txt OK</div>
-          <div class="metric-value ok" style="font-size:14px;font-weight:700;">${robotsOk || '✓'}</div>
+          <div class="metric-value ok text-sm">${robotsOk || '✓'}</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Sitemaps OK</div>
-          <div class="metric-value ok" style="font-size:14px;font-weight:700;">${sitemapsOk || '✓'}</div>
+          <div class="metric-value ok text-sm">${sitemapsOk || '✓'}</div>
         </div>
       </div>
     </div>
