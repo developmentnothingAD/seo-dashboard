@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEO Dashboard — nothingAD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@300;400;600;700;900&family=Overpass+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f9f9f9;
+      --black: #111111;
+      --accent: #d3f75a;
+      --accent-dark: #b8e03a;
+      --white: #ffffff;
+      --gray-100: #f0f0f0;
+      --gray-200: #e0e0e0;
+      --gray-400: #999999;
+      --gray-600: #555555;
+      --red: #ff4444;
+      --orange: #ff8c00;
+      --green: #22c55e;
+      --card-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Overpass', sans-serif;
+      background: var(--bg);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--black);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--white); }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .client-selector {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white);
+      font-family: 'Overpass', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .client-selector option { background: #222; color: white; }
+
+    .refresh-btn {
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      font-family: 'Overpass', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .refresh-btn:hover { background: var(--accent-dark); }
+
+    /* MAIN */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 40px 80px;
+    }
+
+    /* PAGE TITLE */
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-header h1 {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .page-header h1 span {
+      color: var(--accent);
+      background: var(--black);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .page-header p {
+      color: var(--gray-600);
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 28px;
+      background: var(--gray-100);
+      padding: 4px;
+      border-radius: 10px;
+      width: fit-content;
+    }
+
+    .tab {
+      padding: 8px 20px;
+      font-family: 'Overpass', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--gray-600);
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      background: var(--black);
+      color: var(--accent);
+    }
+
+    .tab:hover:not(.active) {
+      background: var(--gray-200);
+      color: var(--black);
+    }
+
+    /* TAB PANELS */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* LOADING */
+    .loading {
+      text-align: center;
+      padding: 80px 0;
+      color: var(--gray-400);
+      font-size: 14px;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--gray-200);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* METRIC GRID */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--gray-200);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    .metric-card.accent {
+      background: var(--black);
+      border-color: var(--black);
+    }
+
+    .metric-card.accent .metric-label { color: rgba(255,255,255,0.5); }
+    .metric-card.accent .metric-value { color: var(--accent); }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-400);
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1;
+      font-family: 'Overpass Mono', monospace;
+    }
+
+    .metric-value.ok { color: var(--green); }
+    .metric-value.warn { color: var(--orange); }
+    .metric-value.bad { color: var(--red); }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--gray-400);
+      margin-top: 4px;
+    }
+
+    /* SECTION */
+    .section {
+      margin-bottom: 28px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray-400);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    /* URL LIST */
+    .url-list-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    .url-list-header {
+      padding: 14px 20px;
+      background: var(--gray-100);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray-600);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .url-count-badge {
+      background: var(--black);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-family: 'Overpass Mono', monospace;
+    }
+
+    .url-list {
+      padding: 0;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .url-item {
+      padding: 10px 20px;
+      font-size: 12px;
+      font-family: 'Overpass Mono', monospace;
+      color: var(--gray-600);
+      border-bottom: 1px solid var(--gray-100);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background 0.15s;
+    }
+
+    .url-item:hover {
+      background: var(--gray-100);
+      color: var(--black);
+    }
+
+    .url-item:last-child { border-bottom: none; }
+
+    .url-item a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .url-item a:hover { color: var(--black); text-decoration: underline; }
+
+    .empty-list {
+      padding: 24px 20px;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 13px;
+    }
+
+    .empty-list .check { font-size: 20px; margin-bottom: 4px; }
+
+    /* TWO COL */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* SCORE BAR */
+    .score-bar-wrap {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--gray-200);
+    }
+
+    .score-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--gray-600);
+    }
+
+    .score-bar-label span:last-child {
+      font-family: 'Overpass Mono', monospace;
+      font-size: 14px;
+      color: var(--black);
+      font-weight: 700;
+    }
+
+    .score-bar {
+      height: 8px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .score-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+    }
+
+    /* DATE BADGE */
+    .date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--black);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-left: 12px;
+      vertical-align: middle;
+    }
+
+    /* NO DATA */
+    .no-data {
+      text-align: center;
+      padding: 60px;
+      color: var(--gray-400);
+      font-size: 14px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      main { padding: 20px 16px 60px; }
+      header { padding: 0 16px; }
+      .two-col { grid-template-columns: 1fr; }
+      .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+      .tabs { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">nothing<span>AD</span> <span style="color:var(--accent);font-weight:300;font-size:14px;">SEO</span></div>
+  <div class="header-right">
+    <select class="client-selector" id="clientSelect">
+      <option value="">Cargando clientes...</option>
+    </select>
+    <button class="refresh-btn" onclick="loadData()">↻ Actualizar</button>
+  </div>
+</header>
+
+<main>
+  <div class="page-header">
+    <h1>SEO Dashboard <span id="clientLabel">—</span></h1>
+    <p id="lastUpdate">Selecciona un cliente para ver los datos</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('tecnica')">Auditoría Técnica</button>
+    <button class="tab" onclick="switchTab('cobertura')">Cobertura</button>
+    <button class="tab" onclick="switchTab('onpage')">On-Page</button>
+    <button class="tab" onclick="switchTab('semrush')">Semrush</button>
+    <button class="tab" onclick="switchTab('enlaces')">Enlaces</button>
+  </div>
+
+  <!-- TÉCNICA -->
+  <div class="tab-panel active" id="panel-tecnica">
+    <div id="tecnica-content"><div class="loading"><div class="spinner"></div>Cargando datos...</div></div>
+  </div>
+
+  <!-- COBERTURA -->
+  <div class="tab-panel" id="panel-cobertura">
+    <div id="cobertura-content"><div class="loading"><div class="spinner"></div>Cargando datos...</div></div>
+  </div>
+
+  <!-- ON-PAGE -->
+  <div class="tab-panel" id="panel-onpage">
+    <div id="onpage-content"><div class="loading"><div class="spinner"></div>Cargando datos...</div></div>
+  </div>
+
+  <!-- SEMRUSH -->
+  <div class="tab-panel" id="panel-semrush">
+    <div id="semrush-content"><div class="loading"><div class="spinner"></div>Cargando datos...</div></div>
+  </div>
+
+  <!-- ENLACES -->
+  <div class="tab-panel" id="panel-enlaces">
+    <div id="enlaces-content"><div class="loading"><div class="spinner"></div>Cargando datos...</div></div>
+  </div>
+</main>
+
+<script>
+const SHEET_ID = '1LONxZhx9RNWMRW6GnAJcdrfvGUYPaP6A6l4TwhPWaZw';
+const SHEETS = {
+  tecnica: 'Auditoría Técnica',
+  cobertura: 'Cobertura de Indexación',
+  onpage: 'Auditoría On-Page',
+  semrush: 'Semrush',
+  enlaces: 'Enlaces Internos'
+};
+
+let allData = {};
+let currentClient = '';
+let activeTab = 'tecnica';
+
+async function fetchSheet(sheetName) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+  const res = await fetch(url);
+  const text = await res.text();
+  const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/)[1]);
+  
+  const cols = json.table.cols.map(c => c.label);
+  const rows = json.table.rows.map(row => {
+    const obj = {};
+    row.c.forEach((cell, i) => {
+      obj[cols[i]] = cell ? cell.v : '';
+    });
+    return obj;
+  });
+  return rows;
+}
+
+async function loadData() {
+  try {
+    const results = await Promise.all(
+      Object.entries(SHEETS).map(async ([key, name]) => {
+        try {
+          const data = await fetchSheet(name);
+          return [key, data];
+        } catch(e) {
+          return [key, []];
+        }
+      })
+    );
+    
+    results.forEach(([key, data]) => { allData[key] = data; });
+    
+    // Build client list
+    const clients = new Set();
+    Object.values(allData).forEach(rows => {
+      rows.forEach(row => {
+        const client = row['Cliente'] || row['cliente'] || '';
+        if (client) clients.add(client);
+      });
+    });
+    
+    const sel = document.getElementById('clientSelect');
+    sel.innerHTML = '';
+    if (clients.size === 0) {
+      sel.innerHTML = '<option value="">Sin datos</option>';
+    } else {
+      clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        sel.appendChild(opt);
+      });
+      currentClient = sel.value;
+      renderAll();
+    }
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+function onClientChange() {
+  currentClient = document.getElementById('clientSelect').value;
+  renderAll();
+}
+
+function renderAll() {
+  document.getElementById('clientLabel').textContent = currentClient || '—';
+  renderTecnica();
+  renderCobertura();
+  renderOnPage();
+  renderSemrush();
+  renderEnlaces();
+}
+
+function getLatestRow(key, clientField) {
+  const rows = (allData[key] || []).filter(r => (r[clientField] || '').includes(currentClient.replace('https://', '').replace('http://', '')));
+  return rows[rows.length - 1] || null;
+}
+
+function formatDate(val) {
+  if (!val) return '';
+  return `<span class="date-badge">📅 ${val}</span>`;
+}
+
+function scoreColor(val, good, bad) {
+  if (val <= bad) return 'bad';
+  if (val <= good) return 'warn';
+  return 'ok';
+}
+
+function urlList(str, label, emptyMsg) {
+  if (!str || str === 'empty' || str.trim() === '') {
+    return `<div class="url-list-card"><div class="url-list-header">${label} <span class="url-count-badge">0</span></div><div class="empty-list"><div class="check">✅</div>${emptyMsg}</div></div>`;
+  }
+  const urls = str.split('|').map(u => u.trim()).filter(Boolean);
+  const items = urls.map(u => `<div class="url-item"><a href="${u}" target="_blank">${u}</a></div>`).join('');
+  return `<div class="url-list-card"><div class="url-list-header">${label} <span class="url-count-badge">${urls.length}</span></div><div class="url-list">${items}</div></div>`;
+}
+
+function renderTecnica() {
+  const row = getLatestRow('tecnica', 'Cliente');
+  const el = document.getElementById('tecnica-content');
+  if (!row) { el.innerHTML = '<div class="no-data">Sin datos de Auditoría Técnica para este cliente</div>'; return; }
+
+  el.innerHTML = `
+    <div class="section">
+      <div class="section-title">Resumen ${formatDate(row['Fecha'])}</div>
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">URLs en Sitemap</div>
+          <div class="metric-value">${row['Total URLs Sitemap'] || row['URLs Sitemap'] || '—'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sitemaps detectados</div>
+          <div class="metric-value">${row['Total Sitemaps'] || '—'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Bloqueos robots.txt</div>
+          <div class="metric-value ${(row['Bloqueos Activos'] || 0) > 0 ? 'warn' : 'ok'}">${row['Bloqueos Activos'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Alertas detectadas</div>
+          <div class="metric-value ${(row['Alertas'] || 0) > 0 ? 'warn' : 'ok'}">${row['Alertas'] || '0'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Respuesta del agente</div>
+      <div class="url-list-card">
+        <div style="padding:20px;font-size:13px;line-height:1.7;color:var(--gray-600);white-space:pre-wrap;font-family:'Overpass Mono',monospace;max-height:300px;overflow-y:auto;">${row['Resumen'] || row['Respuesta'] || 'Sin resumen disponible'}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCobertura() {
+  const row = getLatestRow('cobertura', 'Cliente');
+  const el = document.getElementById('cobertura-content');
+  if (!row) { el.innerHTML = '<div class="no-data">Sin datos de Cobertura para este cliente</div>'; return; }
+
+  const totalSitemap = parseInt(row['Total Sitemap']) || 0;
+  const totalIndexadas = parseInt(row['Total Indexadas']) || 0;
+  const pct = totalSitemap > 0 ? Math.round((totalIndexadas / totalSitemap) * 100) : 0;
+  const barColor = pct >= 80 ? '#22c55e' : pct >= 50 ? '#ff8c00' : '#ff4444';
+
+  el.innerHTML = `
+    <div class="section">
+      <div class="section-title">Cobertura de indexación ${formatDate(row['Fecha Crawler'])}</div>
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">URLs en Sitemap</div>
+          <div class="metric-value">${totalSitemap.toLocaleString()}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">URLs Indexadas (SC)</div>
+          <div class="metric-value">${totalIndexadas.toLocaleString()}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">En Sitemap No Indexadas</div>
+          <div class="metric-value ${(row['En Sitemap No Indexadas']||0) > 0 ? 'warn' : 'ok'}">${row['En Sitemap No Indexadas'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Indexadas No En Sitemap</div>
+          <div class="metric-value ${(row['Indexadas No En Sitemap']||0) > 0 ? 'warn' : 'ok'}">${row['Indexadas No En Sitemap'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Páginas fuera Sitemap</div>
+          <div class="metric-value ${(row['Páginas No En Sitemap']||0) > 0 ? 'warn' : 'ok'}">${row['Páginas No En Sitemap'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Archivos fuera Sitemap</div>
+          <div class="metric-value">${row['Archivos No En Sitemap'] || '0'}</div>
+        </div>
+      </div>
+      <div class="score-bar-wrap" style="margin-bottom:16px;">
+        <div class="score-bar-label"><span>Cobertura de indexación</span><span>${pct}%</span></div>
+        <div class="score-bar"><div class="score-bar-fill" style="width:${pct}%;background:${barColor};"></div></div>
+      </div>
+    </div>
+    <div class="two-col">
+      ${urlList(row['Lista No Indexadas'], 'En Sitemap — No Indexadas', 'Todo el sitemap está indexado')}
+      ${urlList(row['Lista No En Sitemap'], 'Indexadas — No En Sitemap', 'No hay páginas fuera del sitemap')}
+    </div>
+  `;
+}
+
+function renderOnPage() {
+  const row = getLatestRow('onpage', 'Cliente');
+  const el = document.getElementById('onpage-content');
+  if (!row) { el.innerHTML = '<div class="no-data">Sin datos de Auditoría On-Page para este cliente</div>'; return; }
+
+  const score = parseFloat(row['Score Medio Rendimiento']) || 0;
+  const scoreColor = score >= 90 ? '#22c55e' : score >= 50 ? '#ff8c00' : '#ff4444';
+
+  el.innerHTML = `
+    <div class="section">
+      <div class="section-title">Rendimiento ${formatDate(row['Fecha Crawler'])}</div>
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">Score Medio</div>
+          <div class="metric-value">${score}</div>
+          <div class="metric-sub">PageSpeed</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Score Bueno (90+)</div>
+          <div class="metric-value ok">${row['URLs Score Bueno'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Score Medio (50-89)</div>
+          <div class="metric-value warn">${row['URLs Score Medio'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Score Bajo (&lt;50)</div>
+          <div class="metric-value bad">${row['URLs Score Bajo'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">LCP Medio</div>
+          <div class="metric-value">${row['LCP Medio ms'] || '—'}<span style="font-size:14px;font-weight:400">ms</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">CLS Medio</div>
+          <div class="metric-value">${row['CLS Medio'] || '—'}</div>
+        </div>
+      </div>
+      <div class="score-bar-wrap" style="margin-bottom:24px;">
+        <div class="score-bar-label"><span>Score de rendimiento medio</span><span>${score}/100</span></div>
+        <div class="score-bar"><div class="score-bar-fill" style="width:${score}%;background:${scoreColor};"></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Metadatos</div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Sin Title</div>
+          <div class="metric-value ${(row['URLs Sin Title']||0) > 0 ? 'bad' : 'ok'}">${row['URLs Sin Title'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Title Largo</div>
+          <div class="metric-value ${(row['URLs Title Largo']||0) > 0 ? 'warn' : 'ok'}">${row['URLs Title Largo'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sin Meta Desc</div>
+          <div class="metric-value ${(row['URLs Sin Meta Description']||0) > 0 ? 'bad' : 'ok'}">${row['URLs Sin Meta Description'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sin H1</div>
+          <div class="metric-value ${(row['URLs Sin H1']||0) > 0 ? 'bad' : 'ok'}">${row['URLs Sin H1'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">H1 Duplicado</div>
+          <div class="metric-value ${(row['URLs Con H1 Duplicado']||0) > 0 ? 'warn' : 'ok'}">${row['URLs Con H1 Duplicado'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sin H2</div>
+          <div class="metric-value ${(row['URLs Sin H2']||0) > 0 ? 'warn' : 'ok'}">${row['URLs Sin H2'] || '0'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Indexabilidad</div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">No Indexables</div>
+          <div class="metric-value ${(row['URLs No Indexables']||0) > 0 ? 'warn' : 'ok'}">${row['URLs No Indexables'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Con Noindex</div>
+          <div class="metric-value ${(row['URLs Con Noindex']||0) > 0 ? 'warn' : 'ok'}">${row['URLs Con Noindex'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Canonical Incorrecta</div>
+          <div class="metric-value ${(row['URLs Con Canonical Incorrecta']||0) > 0 ? 'bad' : 'ok'}">${row['URLs Con Canonical Incorrecta'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">URLs Largas</div>
+          <div class="metric-value ${(row['URLs Largas']||0) > 0 ? 'warn' : 'ok'}">${row['URLs Largas'] || '0'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="two-col">
+      ${urlList(row['Lista URLs Sin Title'], 'URLs sin Title', 'Todas las páginas tienen title')}
+      ${urlList(row['Lista URLs Sin H1'], 'URLs sin H1', 'Todas las páginas tienen H1')}
+    </div>
+  `;
+}
+
+function renderSemrush() {
+  const row = getLatestRow('semrush', 'Cliente');
+  const el = document.getElementById('semrush-content');
+  if (!row) { el.innerHTML = '<div class="no-data">Sin datos de Semrush para este cliente</div>'; return; }
+
+  const authority = parseInt(row['Autoridad de Dominio']) || 0;
+  const authColor = authority >= 50 ? '#22c55e' : authority >= 30 ? '#ff8c00' : '#ff4444';
+
+  el.innerHTML = `
+    <div class="section">
+      <div class="section-title">Visibilidad orgánica ${formatDate(row['Fecha'])}</div>
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">Authority Score</div>
+          <div class="metric-value">${authority}</div>
+          <div class="metric-sub">/ 100</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Tráfico Orgánico</div>
+          <div class="metric-value">${(parseInt(row['Tráfico Orgánico Estimado'])||0).toLocaleString()}</div>
+          <div class="metric-sub">visitas/mes estimadas</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Keywords Totales</div>
+          <div class="metric-value">${(parseInt(row['Total Keywords Orgánicas'])||0).toLocaleString()}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Pos. 1-3</div>
+          <div class="metric-value ok">${row['Keywords Posición 1-3'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Pos. 4-10</div>
+          <div class="metric-value warn">${row['Keywords Posición 4-10'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Pos. 11-20</div>
+          <div class="metric-value">${row['Keywords Posición 11-20'] || '0'}</div>
+        </div>
+      </div>
+      <div class="score-bar-wrap" style="margin-bottom:24px;">
+        <div class="score-bar-label"><span>Authority Score</span><span>${authority}/100</span></div>
+        <div class="score-bar"><div class="score-bar-fill" style="width:${authority}%;background:${authColor};"></div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Backlinks</div>
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">Total Backlinks</div>
+          <div class="metric-value">${(parseInt(row['Total Backlinks'])||0).toLocaleString()}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Dominios de Referencia</div>
+          <div class="metric-value">${(parseInt(row['Dominios de Referencia'])||0).toLocaleString()}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Score Tóxico</div>
+          <div class="metric-value ${(row['Score Tóxico']||0) > 20 ? 'bad' : (row['Score Tóxico']||0) > 5 ? 'warn' : 'ok'}">${row['Score Tóxico'] || '0'}%</div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">Top Keywords</div>
+      <div class="url-list-card">
+        <div class="url-list">
+          ${(row['Anchor Text Principal'] || '').split('|').map(kw => kw.trim()).filter(Boolean).map(kw => `<div class="url-item">${kw}</div>`).join('') || '<div class="empty-list">Sin datos de keywords</div>'}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEnlaces() {
+  const row = getLatestRow('enlaces', 'Cliente');
+  const el = document.getElementById('enlaces-content');
+  if (!row) { el.innerHTML = '<div class="no-data">Sin datos de Enlaces Internos para este cliente</div>'; return; }
+
+  el.innerHTML = `
+    <div class="section">
+      <div class="section-title">Estructura de enlaces ${formatDate(row['Fecha Crawler'])}</div>
+      <div class="metrics-grid">
+        <div class="metric-card accent">
+          <div class="metric-label">Total URLs</div>
+          <div class="metric-value">${(parseInt(row['Total URLs'])||0).toLocaleString()}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Profundidad Media</div>
+          <div class="metric-value ${(row['Profundidad Media']||0) > 3 ? 'warn' : 'ok'}">${row['Profundidad Media'] || '—'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Errores 404</div>
+          <div class="metric-value ${(row['URLs con Error 404']||0) > 0 ? 'bad' : 'ok'}">${row['URLs con Error 404'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Redirecciones 301</div>
+          <div class="metric-value ${(row['URLs con Redirección 301']||0) > 0 ? 'warn' : 'ok'}">${row['URLs con Redirección 301'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">URLs Profundidad Alta</div>
+          <div class="metric-value ${(row['URLs Profundidad Alta']||0) > 10 ? 'warn' : 'ok'}">${row['URLs Profundidad Alta'] || '0'}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Páginas Huérfanas</div>
+          <div class="metric-value ${(row['URLs Sin Inlinks']||0) > 0 ? 'bad' : 'ok'}">${row['URLs Sin Inlinks'] || '0'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="two-col">
+      ${urlList(row['Lista URLs 404'], 'URLs con Error 404', 'Sin errores 404')}
+      ${urlList(row['Lista URLs 301'], 'Redirecciones 301', 'Sin redirecciones internas')}
+    </div>
+    <div style="margin-top:16px;">
+      ${urlList(row['Lista URLs Profundidad Alta'], 'URLs con Profundidad Alta (>3 clics)', 'Buena estructura de profundidad')}
+    </div>
+  `;
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['tecnica','cobertura','onpage','semrush','enlaces'][i] === tab);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.toggle('active', p.id === `panel-${tab}`);
+  });
+}
+
+document.getElementById('clientSelect').addEventListener('change', onClientChange);
+
+// Init
+loadData();
+</script>
+</body>
+</html>
