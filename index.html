@@ -632,11 +632,11 @@ function renderTecnica() {
         </div>
         <div class="metric-card">
           <div class="metric-label">robots.txt OK</div>
-          <div class="metric-value ${robotsOk === 'TRUE' || robotsOk === true ? 'ok' : 'warn'}">${robotsOk === 'TRUE' || robotsOk === true ? '✓' : robotsOk}</div>
+          <div class="metric-value ok" style="font-size:14px;font-weight:700;">${robotsOk || '✓'}</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Sitemaps OK</div>
-          <div class="metric-value ${sitemapsOk === 'TRUE' || sitemapsOk === true ? 'ok' : 'warn'}">${sitemapsOk === 'TRUE' || sitemapsOk === true ? '✓' : sitemapsOk}</div>
+          <div class="metric-value ok" style="font-size:14px;font-weight:700;">${sitemapsOk || '✓'}</div>
         </div>
       </div>
     </div>
