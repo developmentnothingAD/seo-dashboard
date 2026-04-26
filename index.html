@@ -560,12 +560,28 @@ function renderAll() {
 }
 
 function getLatestRow(key, clientField) {
-  const rows = (allData[key] || []).filter(r => (r[clientField] || '').includes(currentClient.replace('https://', '').replace('http://', '')));
+  const cleanCurrent = currentClient.replace('https://', '').replace('http://', '').replace('www.', '').replace(/\/$/, '');
+  const rows = (allData[key] || []).filter(r => {
+    const val = (r[clientField] || '').replace('https://', '').replace('http://', '').replace('www.', '').replace(/\/$/, '');
+    return val === cleanCurrent || val.includes(cleanCurrent) || cleanCurrent.includes(val);
+  });
   return rows[rows.length - 1] || null;
 }
 
 function formatDate(val) {
   if (!val) return '';
+  // Handle Google Sheets Date(year,month,day) format
+  if (typeof val === 'string' && val.startsWith('Date(')) {
+    const parts = val.replace('Date(', '').replace(')', '').split(',');
+    if (parts.length === 3) {
+      const d = new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2]));
+      val = d.toLocaleDateString('es-ES');
+    }
+  } else if (typeof val === 'number') {
+    // Excel serial date
+    const d = new Date((val - 25569) * 86400 * 1000);
+    val = d.toLocaleDateString('es-ES');
+  }
   return `<span class="date-badge">📅 ${val}</span>`;
 }
 
@@ -589,13 +605,18 @@ function renderTecnica() {
   const el = document.getElementById('tecnica-content');
   if (!row) { el.innerHTML = '<div class="no-data">Sin datos de Auditoría Técnica para este cliente</div>'; return; }
 
+  const alertas = parseInt(row['Alertas']) || 0;
+  const bloqueos = parseInt(row['Bloqueos activos']) || 0;
+  const sitemapsOk = row['Todos los sitemaps OK'] || row['Sitemaps OK'] || '—';
+  const robotsOk = row['robots.txt OK'] || '—';
+
   el.innerHTML = `
     <div class="section">
       <div class="section-title">Resumen ${formatDate(row['Fecha'])}</div>
       <div class="metrics-grid">
         <div class="metric-card accent">
           <div class="metric-label">URLs en Sitemap</div>
-          <div class="metric-value">${row['Total URLs Sitemap'] || row['URLs Sitemap'] || '—'}</div>
+          <div class="metric-value">${row['Total URLs Sitemap'] || row['Total URLs Sitemap'] || '—'}</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Sitemaps detectados</div>
@@ -603,18 +624,26 @@ function renderTecnica() {
         </div>
         <div class="metric-card">
           <div class="metric-label">Bloqueos robots.txt</div>
-          <div class="metric-value ${(row['Bloqueos Activos'] || 0) > 0 ? 'warn' : 'ok'}">${row['Bloqueos Activos'] || '0'}</div>
+          <div class="metric-value ${bloqueos > 0 ? 'warn' : 'ok'}">${bloqueos}</div>
         </div>
         <div class="metric-card">
           <div class="metric-label">Alertas detectadas</div>
-          <div class="metric-value ${(row['Alertas'] || 0) > 0 ? 'warn' : 'ok'}">${row['Alertas'] || '0'}</div>
+          <div class="metric-value ${alertas > 0 ? 'warn' : 'ok'}">${alertas}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">robots.txt OK</div>
+          <div class="metric-value ${robotsOk === 'TRUE' || robotsOk === true ? 'ok' : 'warn'}">${robotsOk === 'TRUE' || robotsOk === true ? '✓' : robotsOk}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sitemaps OK</div>
+          <div class="metric-value ${sitemapsOk === 'TRUE' || sitemapsOk === true ? 'ok' : 'warn'}">${sitemapsOk === 'TRUE' || sitemapsOk === true ? '✓' : sitemapsOk}</div>
         </div>
       </div>
     </div>
     <div class="section">
-      <div class="section-title">Respuesta del agente</div>
+      <div class="section-title">Estado general</div>
       <div class="url-list-card">
-        <div style="padding:20px;font-size:13px;line-height:1.7;color:var(--gray-600);white-space:pre-wrap;font-family:'Overpass Mono',monospace;max-height:300px;overflow-y:auto;">${row['Resumen'] || row['Respuesta'] || 'Sin resumen disponible'}</div>
+        <div style="padding:20px;font-size:13px;line-height:1.7;color:var(--gray-600);white-space:pre-wrap;font-family:'Overpass Mono',monospace;max-height:300px;overflow-y:auto;">${row['Estado General'] || 'Sin resumen disponible'}</div>
       </div>
     </div>
   `;
