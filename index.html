@@ -420,6 +420,87 @@
       font-size: 14px;
     }
 
+
+    /* CONTROL PANEL */
+    .control-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .control-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--card-shadow);
+      padding: 24px;
+    }
+    .control-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .control-input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--gray-200);
+      border-radius: 8px;
+      font-family: 'Overpass', sans-serif;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .control-input:focus { border-color: var(--accent); }
+    .control-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--black);
+      color: var(--accent);
+      border: none;
+      border-radius: 8px;
+      font-family: 'Overpass', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 8px;
+    }
+    .control-btn:hover { background: #333; }
+    .control-btn.accent { background: var(--accent); color: var(--black); }
+    .control-btn.accent:hover { background: var(--accent-dark); }
+    .control-btn.outline { background: transparent; color: var(--black); border: 1px solid var(--gray-200); }
+    .control-btn.outline:hover { background: var(--gray-100); }
+    .agent-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--gray-100);
+      font-size: 13px;
+    }
+    .agent-status:last-child { border-bottom: none; }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gray-200);
+      display: inline-block; margin-right: 8px;
+    }
+    .status-dot.ok { background: var(--green); }
+    .status-dot.running { background: var(--orange); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .agent-run-btn {
+      background: var(--accent);
+      color: var(--black);
+      border: none;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-family: 'Overpass', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .agent-run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       main { padding: 20px 16px 60px; }
@@ -449,11 +530,17 @@
   </div>
 
   <div class="tabs">
+    <button class="tab" onclick="switchTab('control')">⚡ Control</button>
     <button class="tab active" onclick="switchTab('tecnica')">Auditoría Técnica</button>
     <button class="tab" onclick="switchTab('cobertura')">Cobertura</button>
     <button class="tab" onclick="switchTab('onpage')">On-Page</button>
     <button class="tab" onclick="switchTab('semrush')">Semrush</button>
     <button class="tab" onclick="switchTab('enlaces')">Enlaces</button>
+  </div>
+
+  <!-- CONTROL -->
+  <div class="tab-panel" id="panel-control">
+    <div id="control-content"></div>
   </div>
 
   <!-- TÉCNICA -->
@@ -563,6 +650,7 @@ function onClientChange() {
 
 function renderAll() {
   document.getElementById('clientLabel').textContent = currentClient || '—';
+  renderControl();
   renderTecnica();
   renderCobertura();
   renderOnPage();
@@ -928,10 +1016,94 @@ function renderEnlaces() {
   `;
 }
 
+
+const WEBHOOKS = {
+  tecnica: 'https://nothingad.app.n8n.cloud/webhook/f97308b9-784c-44a4-831b-1a538fde2c52',
+  cobertura: 'https://nothingad.app.n8n.cloud/webhook/60e66dbc-1ddd-49dd-a74a-b55ff2e946d9',
+  semrush: 'https://nothingad.app.n8n.cloud/webhook/747c9460-4670-4c43-bee3-965e51195030'
+};
+
+const DRIVE_FOLDER = 'https://drive.google.com/drive/folders/CARPETA_SCREAMING_FROG';
+
+const agentStatus = {};
+
+async function runAgent(type, domain) {
+  if (!domain) { alert('Introduce un dominio'); return; }
+  const btn = document.getElementById(`btn-${type}`);
+  const dot = document.getElementById(`dot-${type}`);
+  const msg = document.getElementById(`msg-${type}`);
+  btn.disabled = true;
+  dot.className = 'status-dot running';
+  msg.textContent = 'Ejecutando...';
+  try {
+    await fetch(`${WEBHOOKS[type]}?domain=${encodeURIComponent(domain)}`, { mode: 'no-cors' });
+    dot.className = 'status-dot ok';
+    msg.textContent = 'Lanzado — ' + new Date().toLocaleTimeString('es-ES');
+  } catch(e) {
+    dot.className = 'status-dot ok';
+    msg.textContent = 'Lanzado — ' + new Date().toLocaleTimeString('es-ES');
+  }
+  btn.disabled = false;
+}
+
+function renderControl() {
+  const el = document.getElementById('control-content');
+  const domain = currentClient || '';
+  el.innerHTML = `
+    <div class="section">
+      <div class="section-title">Lanzar auditoría</div>
+      <div class="control-grid">
+        <div class="control-card">
+          <h3>🚀 Ejecutar agentes automáticos</h3>
+          <input type="text" class="control-input" id="agentDomain" placeholder="dominio.com" value="${domain.replace('https://','').replace('www.','')}">
+          <div class="agent-status">
+            <span><span class="status-dot ok" id="dot-tecnica"></span>Auditoría Técnica</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="agent-run-btn" id="msg-tecnica" style="background:none;color:var(--gray-400);font-weight:400;"></span>
+              <button class="agent-run-btn" id="btn-tecnica" onclick="runAgent('tecnica', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
+            </div>
+          </div>
+          <div class="agent-status">
+            <span><span class="status-dot ok" id="dot-cobertura"></span>Cobertura de Indexación</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="agent-run-btn" id="msg-cobertura" style="background:none;color:var(--gray-400);font-weight:400;"></span>
+              <button class="agent-run-btn" id="btn-cobertura" onclick="runAgent('cobertura', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
+            </div>
+          </div>
+          <div class="agent-status">
+            <span><span class="status-dot ok" id="dot-semrush"></span>Semrush</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="agent-run-btn" id="msg-semrush" style="background:none;color:var(--gray-400);font-weight:400;"></span>
+              <button class="agent-run-btn" id="btn-semrush" onclick="runAgent('semrush', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <button class="control-btn accent" onclick="runAllAgents()">⚡ Ejecutar todos</button>
+          </div>
+        </div>
+        <div class="control-card">
+          <h3>📁 Screaming Frog</h3>
+          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;line-height:1.6;">Para ejecutar la Auditoría On-Page y el análisis de Enlaces Internos, sube el export de Screaming Frog a la carpeta de Drive. El agente lo procesará automáticamente.</p>
+          <button class="control-btn outline" onclick="window.open('${DRIVE_FOLDER}', '_blank')">📂 Abrir carpeta Drive</button>
+          <p style="font-size:11px;color:var(--gray-400);margin-top:8px;">Nombre del archivo: <strong>${domain.replace('https://','').replace('www.','') || 'dominio.com'}.xlsx</strong></p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function runAllAgents() {
+  const domain = document.getElementById('agentDomain').value;
+  if (!domain) { alert('Introduce un dominio'); return; }
+  await runAgent('tecnica', domain);
+  await runAgent('cobertura', domain);
+  await runAgent('semrush', domain);
+}
+
 function switchTab(tab) {
   activeTab = tab;
   document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', ['tecnica','cobertura','onpage','semrush','enlaces'][i] === tab);
+    t.classList.toggle('active', ['control','tecnica','cobertura','onpage','semrush','enlaces'][i] === tab);
   });
   document.querySelectorAll('.tab-panel').forEach(p => {
     p.classList.toggle('active', p.id === `panel-${tab}`);
