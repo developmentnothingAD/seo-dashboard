@@ -970,28 +970,38 @@ function renderSemrush() {
     </div>
     <div class="section">
       <div class="section-title">Lista de Backlinks</div>
-      <div class="url-list-card">
-        <div class="url-list-header">Top 50 backlinks <span class="url-count-badge">${(row['Lista Backlinks'] || '').split('\n').filter(Boolean).length}</span></div>
-        <div class="url-list" style="max-height:400px;">
-          ${(row['Lista Backlinks'] || '').split('\n').map(bl => {
-            if (!bl.trim()) return '';
-            const parts = bl.split(' | ');
-            const url = parts[0] || '';
-            const anchor = parts[1] || '';
-            const score = parts[2] || '';
-            const type = parts[3] || '';
-            const typeColor = type.trim() === 'follow' ? 'var(--green)' : 'var(--gray-400)';
-            return \`<div class="url-item" style="display:flex;justify-content:space-between;align-items:center;">
-              <span style="flex:1;overflow:hidden;text-overflow:ellipsis;"><a href="\${url}" target="_blank">\${url}</a></span>
-              <span style="margin-left:8px;color:var(--gray-400);font-size:11px;flex-shrink:0;">\${anchor}</span>
-              <span style="margin-left:8px;font-size:11px;flex-shrink:0;">\${score}</span>
-              <span style="margin-left:8px;font-size:10px;color:\${typeColor};flex-shrink:0;font-weight:700;">\${type.trim()}</span>
-            </div>\`;
-          }).filter(Boolean).join('') || '<div class="empty-list">Sin datos de backlinks</div>'}
-        </div>
+      <div class="url-list-card" id="backlinks-card">
       </div>
     </div>
-  \`;
+  `;
+  // Render backlinks separately to avoid template literal issues
+  const blRaw = row['Lista Backlinks'] || '';
+  const blLines = blRaw.split('\n').filter(b => b.trim());
+  const blCard = document.getElementById('backlinks-card');
+  if (blCard) {
+    let blHtml = '<div class="url-list-header">Top 50 backlinks <span class="url-count-badge">' + blLines.length + '</span></div>';
+    blHtml += '<div class="url-list" style="max-height:400px;">';
+    if (blLines.length === 0) {
+      blHtml += '<div class="empty-list">Sin datos de backlinks</div>';
+    } else {
+      blLines.forEach(bl => {
+        const parts = bl.split(' | ');
+        const url = parts[0] || '';
+        const anchor = parts[1] || '';
+        const score = parts[2] || '';
+        const type = (parts[3] || '').trim();
+        const typeColor = type === 'follow' ? 'var(--green)' : 'var(--gray-400)';
+        blHtml += '<div class="url-item" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">';
+        blHtml += '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;"><a href="' + url + '" target="_blank">' + url + '</a></span>';
+        blHtml += '<span style="color:var(--gray-400);font-size:11px;flex-shrink:0;">' + anchor + '</span>';
+        blHtml += '<span style="font-size:11px;flex-shrink:0;">' + score + '</span>';
+        blHtml += '<span style="font-size:10px;color:' + typeColor + ';flex-shrink:0;font-weight:700;">' + type + '</span>';
+        blHtml += '</div>';
+      });
+    }
+    blHtml += '</div>';
+    blCard.innerHTML = blHtml;
+  }
 }
 
 function renderEnlaces() {
