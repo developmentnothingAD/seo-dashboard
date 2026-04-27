@@ -1020,7 +1020,9 @@ function renderEnlaces() {
 const WEBHOOKS = {
   tecnica: 'https://nothingad.app.n8n.cloud/webhook/f97308b9-784c-44a4-831b-1a538fde2c52',
   cobertura: 'https://nothingad.app.n8n.cloud/webhook/60e66dbc-1ddd-49dd-a74a-b55ff2e946d9',
-  semrush: 'https://nothingad.app.n8n.cloud/webhook/747c9460-4670-4c43-bee3-965e51195030'
+  semrush: 'https://nothingad.app.n8n.cloud/webhook/747c9460-4670-4c43-bee3-965e51195030',
+  onpage: 'https://nothingad.app.n8n.cloud/webhook/d290f9a1-492f-4ed0-a024-374425fc5c05',
+  enlaces: 'https://nothingad.app.n8n.cloud/webhook/4c957f71-6a44-4841-bb41-2f2a4a973ef7'
 };
 
 const DRIVE_FOLDER = 'https://drive.google.com/drive/folders/1D3XAtNQh_95RtYMfc5BLdP9iFWYCJZhR';
@@ -1077,13 +1079,27 @@ function renderControl() {
               <button class="agent-run-btn" id="btn-semrush" onclick="runAgent('semrush', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
             </div>
           </div>
+          <div class="agent-status">
+            <span><span class="status-dot ok" id="dot-onpage"></span>Auditoría On-Page</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="agent-run-btn" id="msg-onpage" style="background:none;color:var(--gray-400);font-weight:400;"></span>
+              <button class="agent-run-btn" id="btn-onpage" onclick="runAgent('onpage', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
+            </div>
+          </div>
+          <div class="agent-status">
+            <span><span class="status-dot ok" id="dot-enlaces"></span>Enlaces Internos</span>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="agent-run-btn" id="msg-enlaces" style="background:none;color:var(--gray-400);font-weight:400;"></span>
+              <button class="agent-run-btn" id="btn-enlaces" onclick="runAgent('enlaces', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
+            </div>
+          </div>
           <div style="margin-top:16px;">
             <button class="control-btn accent" onclick="runAllAgents()">⚡ Ejecutar todos</button>
           </div>
         </div>
         <div class="control-card">
           <h3>📁 Screaming Frog</h3>
-          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;line-height:1.6;">Para ejecutar la Auditoría On-Page y el análisis de Enlaces Internos, sube el export de Screaming Frog a la carpeta de Drive. El agente lo procesará automáticamente.</p>
+          <p style="font-size:13px;color:var(--gray-600);margin-bottom:16px;line-height:1.6;">Para ejecutar la Auditoría On-Page y el análisis de Enlaces Internos, primero sube el export de Screaming Frog a Drive con el nombre correcto, y luego pulsa los botones de la izquierda.</p>
           <button class="control-btn outline" onclick="window.open('${DRIVE_FOLDER}', '_blank')">📂 Abrir carpeta Drive</button>
           <p style="font-size:11px;color:var(--gray-400);margin-top:8px;">Nombre del archivo: <strong>${domain.replace('https://','').replace('www.','') || 'dominio.com'}.xlsx</strong></p>
         </div>
@@ -1098,6 +1114,8 @@ async function runAllAgents() {
   await runAgent('tecnica', domain);
   await runAgent('cobertura', domain);
   await runAgent('semrush', domain);
+  await runAgent('onpage', domain);
+  await runAgent('enlaces', domain);
 }
 
 function switchTab(tab) {
