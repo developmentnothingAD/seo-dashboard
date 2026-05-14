@@ -648,6 +648,210 @@
       box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
     }
 
+
+    /* CLIENT CARDS */
+    .clients-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .client-card {
+      background: var(--surface-50);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--surface-300);
+      padding: 20px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .client-card:hover {
+      border-color: var(--nadia-400);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.08), 0 4px 16px rgba(0,0,0,0.08);
+      transform: translateY(-1px);
+    }
+
+    .client-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .client-card-domain {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--surface-900);
+    }
+
+    .client-card-date {
+      font-size: 11px;
+      color: var(--surface-400);
+      font-weight: 500;
+    }
+
+    .client-card-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .client-mini-metric {
+      background: var(--surface-100);
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .client-mini-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--surface-400);
+      margin-bottom: 4px;
+    }
+
+    .client-mini-value {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--surface-900);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .client-mini-value.ok { color: var(--trust-approved); }
+    .client-mini-value.warn { color: var(--trust-processed); }
+    .client-mini-value.bad { color: var(--trust-raw); }
+
+    .client-card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .client-card-btn {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .client-card-btn.view {
+      background: var(--nadia-50);
+      color: var(--nadia-600);
+      border: 1px solid rgba(124,58,237,0.2);
+    }
+
+    .client-card-btn.view:hover {
+      background: var(--nadia-600);
+      color: white;
+    }
+
+    .client-card-btn.report {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+    }
+
+    .client-card-btn.report:hover {
+      box-shadow: 0 0 12px rgba(99,102,241,0.4);
+    }
+
+    .home-section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--surface-900);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .launch-card {
+      background: linear-gradient(135deg, var(--nadia-600), var(--nadia-500));
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      color: white;
+      margin-bottom: 28px;
+    }
+
+    .launch-card h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      opacity: 0.9;
+    }
+
+    .launch-card p {
+      font-size: 13px;
+      opacity: 0.7;
+      margin-bottom: 16px;
+    }
+
+    .launch-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .launch-input {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+    }
+
+    .launch-input::placeholder { color: rgba(255,255,255,0.5); }
+    .launch-input:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.2); }
+
+    .launch-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .launch-btn.white {
+      background: white;
+      color: var(--nadia-600);
+    }
+
+    .launch-btn.white:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.2); transform: translateY(-1px); }
+
+    .launch-btn.outline-white {
+      background: transparent;
+      color: white;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+
+    .launch-btn.outline-white:hover { background: rgba(255,255,255,0.15); }
+
+    .tools-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
       main { padding: 16px 16px 60px; }
@@ -678,14 +882,14 @@
 <main>
   <div class="page-header">
     <div>
-      <h1>SEO Dashboard <span class="client-pill" id="clientLabel">—</span></h1>
+      <h1 id="pageTitle">SEO Dashboard</h1>
       <p id="lastUpdate">Selecciona un cliente para ver los datos</p>
     </div>
   </div>
 
   <div class="tabs">
-    <button class="tab" onclick="switchTab('control')">⚡ Control</button>
-    <button class="tab active" onclick="switchTab('tecnica')">Auditoría Técnica</button>
+    <button class="tab active" onclick="switchTab('control')">⚡ Control</button>
+    <button class="tab" onclick="switchTab('tecnica')">Auditoría Técnica</button>
     <button class="tab" onclick="switchTab('cobertura')">Cobertura</button>
     <button class="tab" onclick="switchTab('onpage')">On-Page</button>
     <button class="tab" onclick="switchTab('semrush')">Semrush</button>
@@ -693,12 +897,12 @@
   </div>
 
   <!-- CONTROL -->
-  <div class="tab-panel" id="panel-control">
+  <div class="tab-panel active" id="panel-control">
     <div id="control-content"></div>
   </div>
 
   <!-- TÉCNICA -->
-  <div class="tab-panel active" id="panel-tecnica">
+  <div class="tab-panel" id="panel-tecnica">
     <div id="tecnica-content"><div class="loading"><div class="spinner"></div>Cargando datos...</div></div>
   </div>
 
@@ -874,7 +1078,7 @@ async function runAllAgents() {
 }
 
 async function generateReport() {
-  const domain = document.getElementById('agentDomain').value;
+  const domain = document.getElementById('agentDomain') ? document.getElementById('agentDomain').value : currentClient.replace('https://','').replace('www.','');
   if (!domain) { alert('Introduce un dominio'); return; }
   const btn = document.getElementById('btn-slides');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Generando...'; }
@@ -889,71 +1093,152 @@ async function generateReport() {
 
 function renderControl() {
   const el = document.getElementById('control-content');
-  const domain = currentClient.replace('https://','').replace('www.','') || '';
-  el.innerHTML = `
-    <div class="section">
-      <div class="section-title">Lanzar auditoría</div>
-      <div class="control-grid">
-        <div class="control-card">
-          <h3>🚀 Ejecutar agentes</h3>
-          <input type="text" class="control-input" id="agentDomain" placeholder="dominio.com" value="${domain}">
-          <div class="agent-status">
-            <span><span class="status-dot ok" id="dot-tecnica"></span>Auditoría Técnica</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span class="agent-msg" id="msg-tecnica"></span>
-              <button class="agent-run-btn" id="btn-tecnica" onclick="runAgent('tecnica', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
-            </div>
+
+  // Build client cards from all data
+  const clients = new Set();
+  Object.values(allData).forEach(rows => {
+    rows.forEach(row => {
+      const c = row['Cliente'] || row['cliente'] || '';
+      if (c) clients.add(c);
+    });
+  });
+
+  let cardsHtml = '';
+  clients.forEach(client => {
+    const cleanClient = client.replace('https://','').replace('http://','').replace('www.','').replace(/\/$/,'');
+
+    function getRow(key) {
+      const rows = (allData[key] || []).filter(r => {
+        const v = (r['Cliente'] || '').replace('https://','').replace('http://','').replace('www.','').replace(/\/$/,'');
+        return v === cleanClient || v.includes(cleanClient) || cleanClient.includes(v);
+      });
+      return rows[rows.length - 1] || {};
+    }
+
+    const tec = getRow('tecnica');
+    const sem = getRow('semrush');
+    const onp = getRow('onpage');
+    const enl = getRow('enlaces');
+    const cob = getRow('cobertura');
+
+    const authority = parseInt(sem['Autoridad de Dominio']) || 0;
+    const score = parseFloat(onp['Score Medio Rendimiento']) || 0;
+    const errores404 = parseInt(enl['URLs con Error 404']) || 0;
+    const urlsSitemap = parseInt(tec['Total URLs Sitemap']) || 0;
+    const indexadas = parseInt(cob['Total Indexadas']) || 0;
+    const noIndexadas = parseInt(cob['En Sitemap No Indexadas']) || 0;
+
+    const authClass = authority >= 50 ? 'ok' : authority >= 30 ? 'warn' : 'bad';
+    const scoreClass = score >= 80 ? 'ok' : score >= 50 ? 'warn' : 'bad';
+    const err404Class = errores404 > 0 ? 'bad' : 'ok';
+
+    const fecha = tec['Fecha'] || sem['Fecha'] || onp['Fecha Crawler'] || '';
+    let fechaStr = '';
+    if (fecha) {
+      if (typeof fecha === 'string' && fecha.startsWith('Date(')) {
+        const parts = fecha.replace('Date(','').replace(')','').split(',');
+        if (parts.length === 3) fechaStr = new Date(parseInt(parts[0]), parseInt(parts[1]), parseInt(parts[2])).toLocaleDateString('es-ES');
+      } else { fechaStr = String(fecha); }
+    }
+
+    cardsHtml += \`
+      <div class="client-card" onclick="selectClient('${client}')">
+        <div class="client-card-header">
+          <div class="client-card-domain">🌐 ${cleanClient}</div>
+          <div class="client-card-date">${fechaStr ? '📅 ' + fechaStr : 'Sin fecha'}</div>
+        </div>
+        <div class="client-card-metrics">
+          <div class="client-mini-metric">
+            <div class="client-mini-label">Authority</div>
+            <div class="client-mini-value \${authClass}">\${authority || '—'}</div>
           </div>
-          <div class="agent-status">
-            <span><span class="status-dot ok" id="dot-cobertura"></span>Cobertura de Indexación</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span class="agent-msg" id="msg-cobertura"></span>
-              <button class="agent-run-btn" id="btn-cobertura" onclick="runAgent('cobertura', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
-            </div>
+          <div class="client-mini-metric">
+            <div class="client-mini-label">Score Web</div>
+            <div class="client-mini-value \${scoreClass}">\${score || '—'}</div>
           </div>
-          <div class="agent-status">
-            <span><span class="status-dot ok" id="dot-semrush"></span>Semrush</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span class="agent-msg" id="msg-semrush"></span>
-              <button class="agent-run-btn" id="btn-semrush" onclick="runAgent('semrush', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
-            </div>
+          <div class="client-mini-metric">
+            <div class="client-mini-label">Errores 404</div>
+            <div class="client-mini-value \${err404Class}">\${errores404}</div>
           </div>
-          <div class="agent-status">
-            <span><span class="status-dot ok" id="dot-onpage"></span>Auditoría On-Page</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span class="agent-msg" id="msg-onpage"></span>
-              <button class="agent-run-btn" id="btn-onpage" onclick="runAgent('onpage', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
-            </div>
+          <div class="client-mini-metric">
+            <div class="client-mini-label">URLs Sitemap</div>
+            <div class="client-mini-value">\${urlsSitemap || '—'}</div>
           </div>
-          <div class="agent-status">
-            <span><span class="status-dot ok" id="dot-enlaces"></span>Enlaces Internos</span>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span class="agent-msg" id="msg-enlaces"></span>
-              <button class="agent-run-btn" id="btn-enlaces" onclick="runAgent('enlaces', document.getElementById('agentDomain').value)">▶ Ejecutar</button>
-            </div>
+          <div class="client-mini-metric">
+            <div class="client-mini-label">Indexadas</div>
+            <div class="client-mini-value">\${indexadas || '—'}</div>
           </div>
-          <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
-            <button class="control-btn primary" onclick="runAllAgents()">⚡ Ejecutar todos los agentes</button>
+          <div class="client-mini-metric">
+            <div class="client-mini-label">No Indexadas</div>
+            <div class="client-mini-value \${noIndexadas > 0 ? 'warn' : 'ok'}">\${noIndexadas}</div>
           </div>
         </div>
-        <div class="control-card" style="display:flex;flex-direction:column;gap:12px;">
-          <h3>📊 Informes & Archivos</h3>
-          <div style="background:var(--nadia-50);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:16px;">
-            <div style="font-size:12px;font-weight:600;color:var(--nadia-600);margin-bottom:8px;">✨ Informe con IA</div>
-            <p style="font-size:12px;color:var(--surface-600);margin-bottom:12px;line-height:1.6;">Genera un informe completo en Gamma con todos los datos de la auditoría y recomendaciones IA.</p>
-            <button class="control-btn gamma" id="btn-slides" onclick="generateReport()">✨ Generar informe</button>
-            <button class="control-btn outline" onclick="window.open('${GAMMA_URL}', '_blank')">🔗 Ver informes en Gamma</button>
-          </div>
-          <div style="background:var(--surface-100);border:1px solid var(--surface-300);border-radius:12px;padding:16px;">
-            <div style="font-size:12px;font-weight:600;color:var(--surface-700);margin-bottom:8px;">📁 Screaming Frog</div>
-            <p style="font-size:12px;color:var(--surface-600);margin-bottom:12px;line-height:1.6;">Sube el export de Screaming Frog a Drive y luego ejecuta On-Page y Enlaces.</p>
-            <p style="font-size:11px;color:var(--surface-400);margin-bottom:10px;">Nombre: <strong>${domain || 'dominio.com'}.xlsx</strong></p>
-            <button class="control-btn outline" onclick="window.open('${DRIVE_FOLDER}', '_blank')">📂 Abrir carpeta Drive</button>
-          </div>
+        <div class="client-card-actions">
+          <button class="client-card-btn view" onclick="event.stopPropagation(); selectClient('${client}')">👁 Ver datos</button>
+          <button class="client-card-btn report" onclick="event.stopPropagation(); generateReportForClient('${cleanClient}')">✨ Generar informe</button>
         </div>
       </div>
+    \`;
+  });
+
+  el.innerHTML = \`
+    <div class="launch-card">
+      <h2>🚀 Nueva auditoría</h2>
+      <p>Introduce el dominio del cliente y lanza los agentes de análisis</p>
+      <div class="launch-input-row">
+        <input type="text" class="launch-input" id="agentDomain" placeholder="dominio.com">
+        <button class="launch-btn white" onclick="runAllAgents()">⚡ Ejecutar todos</button>
+        <button class="launch-btn outline-white" onclick="runAgent('tecnica', document.getElementById('agentDomain').value)">Técnica</button>
+        <button class="launch-btn outline-white" onclick="runAgent('cobertura', document.getElementById('agentDomain').value)">Cobertura</button>
+        <button class="launch-btn outline-white" onclick="runAgent('semrush', document.getElementById('agentDomain').value)">Semrush</button>
+        <button class="launch-btn outline-white" onclick="runAgent('onpage', document.getElementById('agentDomain').value)">On-Page</button>
+        <button class="launch-btn outline-white" onclick="runAgent('enlaces', document.getElementById('agentDomain').value)">Enlaces</button>
+      </div>
+      <div class="tools-row">
+        <button class="launch-btn outline-white" onclick="window.open('${DRIVE_FOLDER}', '_blank')">📂 Carpeta Screaming Frog</button>
+        <button class="launch-btn outline-white" onclick="window.open('${GAMMA_URL}', '_blank')">🔗 Ver informes en Gamma</button>
+      </div>
     </div>
-  `;
+
+    \${clients.size > 0 ? \`
+    <div class="home-section-title">📊 Clientes auditados <span style="font-size:13px;font-weight:500;color:var(--surface-400);margin-left:8px;">\${clients.size} clientes</span></div>
+    <div class="clients-grid">\${cardsHtml}</div>
+    \` : '<div class="no-data">Aún no hay datos de clientes. Lanza tu primera auditoría arriba.</div>'}
+
+    <div style="display:none">
+      <span id="dot-tecnica"></span><span id="msg-tecnica"></span>
+      <span id="dot-cobertura"></span><span id="msg-cobertura"></span>
+      <span id="dot-semrush"></span><span id="msg-semrush"></span>
+      <span id="dot-onpage"></span><span id="msg-onpage"></span>
+      <span id="dot-enlaces"></span><span id="msg-enlaces"></span>
+    </div>
+  \`;
+}
+
+function selectClient(client) {
+  currentClient = client;
+  document.getElementById('clientSelect').value = client;
+  document.getElementById('clientLabel').textContent = client;
+  renderTecnica();
+  renderCobertura();
+  renderOnPage();
+  renderSemrush();
+  renderEnlaces();
+  switchTab('tecnica');
+}
+
+async function generateReportForClient(domain) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ Generando...';
+  try {
+    await fetch(\`\${WEBHOOKS.slides}?domain=\${encodeURIComponent(domain)}\`, { mode: 'no-cors' });
+    btn.textContent = '✓ En proceso';
+    setTimeout(() => { btn.disabled = false; btn.textContent = '✨ Generar informe'; }, 5000);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✨ Generar informe';
+  }
 }
 
 function renderTecnica() {
