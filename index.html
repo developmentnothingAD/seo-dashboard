@@ -1094,7 +1094,6 @@ async function generateReport() {
 function renderControl() {
   const el = document.getElementById('control-content');
 
-  // Build client cards from all data
   const clients = new Set();
   Object.values(allData).forEach(rows => {
     rows.forEach(row => {
@@ -1103,23 +1102,22 @@ function renderControl() {
     });
   });
 
+  function getClientRow(key, cleanClient) {
+    const rows = (allData[key] || []).filter(r => {
+      const v = (r['Cliente'] || '').replace('https://','').replace('http://','').replace('www.','').replace(/\/$/,'');
+      return v === cleanClient || v.includes(cleanClient) || cleanClient.includes(v);
+    });
+    return rows[rows.length - 1] || {};
+  }
+
   let cardsHtml = '';
-  clients.forEach(client => {
-    const cleanClient = client.replace('https://','').replace('http://','').replace('www.','').replace(/\/$/,'');
-
-    function getRow(key) {
-      const rows = (allData[key] || []).filter(r => {
-        const v = (r['Cliente'] || '').replace('https://','').replace('http://','').replace('www.','').replace(/\/$/,'');
-        return v === cleanClient || v.includes(cleanClient) || cleanClient.includes(v);
-      });
-      return rows[rows.length - 1] || {};
-    }
-
-    const tec = getRow('tecnica');
-    const sem = getRow('semrush');
-    const onp = getRow('onpage');
-    const enl = getRow('enlaces');
-    const cob = getRow('cobertura');
+  clients.forEach(function(client) {
+    const cleanClient = client.replace('https://','').replace('http://','').replace('www.','').replace(/\/$/, '');
+    const tec = getClientRow('tecnica', cleanClient);
+    const sem = getClientRow('semrush', cleanClient);
+    const onp = getClientRow('onpage', cleanClient);
+    const enl = getClientRow('enlaces', cleanClient);
+    const cob = getClientRow('cobertura', cleanClient);
 
     const authority = parseInt(sem['Autoridad de Dominio']) || 0;
     const score = parseFloat(onp['Score Medio Rendimiento']) || 0;
@@ -1141,78 +1139,52 @@ function renderControl() {
       } else { fechaStr = String(fecha); }
     }
 
-    cardsHtml += \`
-      <div class="client-card" onclick="selectClient('${client}')">
-        <div class="client-card-header">
-          <div class="client-card-domain">🌐 ${cleanClient}</div>
-          <div class="client-card-date">${fechaStr ? '📅 ' + fechaStr : 'Sin fecha'}</div>
-        </div>
-        <div class="client-card-metrics">
-          <div class="client-mini-metric">
-            <div class="client-mini-label">Authority</div>
-            <div class="client-mini-value \${authClass}">\${authority || '—'}</div>
-          </div>
-          <div class="client-mini-metric">
-            <div class="client-mini-label">Score Web</div>
-            <div class="client-mini-value \${scoreClass}">\${score || '—'}</div>
-          </div>
-          <div class="client-mini-metric">
-            <div class="client-mini-label">Errores 404</div>
-            <div class="client-mini-value \${err404Class}">\${errores404}</div>
-          </div>
-          <div class="client-mini-metric">
-            <div class="client-mini-label">URLs Sitemap</div>
-            <div class="client-mini-value">\${urlsSitemap || '—'}</div>
-          </div>
-          <div class="client-mini-metric">
-            <div class="client-mini-label">Indexadas</div>
-            <div class="client-mini-value">\${indexadas || '—'}</div>
-          </div>
-          <div class="client-mini-metric">
-            <div class="client-mini-label">No Indexadas</div>
-            <div class="client-mini-value \${noIndexadas > 0 ? 'warn' : 'ok'}">\${noIndexadas}</div>
-          </div>
-        </div>
-        <div class="client-card-actions">
-          <button class="client-card-btn view" onclick="event.stopPropagation(); selectClient('${client}')">👁 Ver datos</button>
-          <button class="client-card-btn report" onclick="event.stopPropagation(); generateReportForClient('${cleanClient}')">✨ Generar informe</button>
-        </div>
-      </div>
-    \`;
+    cardsHtml += '<div class="client-card">';
+    cardsHtml += '<div class="client-card-header">';
+    cardsHtml += '<div class="client-card-domain">🌐 ' + cleanClient + '</div>';
+    cardsHtml += '<div class="client-card-date">' + (fechaStr ? '📅 ' + fechaStr : 'Sin fecha') + '</div>';
+    cardsHtml += '</div>';
+    cardsHtml += '<div class="client-card-metrics">';
+    cardsHtml += '<div class="client-mini-metric"><div class="client-mini-label">Authority</div><div class="client-mini-value ' + authClass + '">' + (authority || '—') + '</div></div>';
+    cardsHtml += '<div class="client-mini-metric"><div class="client-mini-label">Score Web</div><div class="client-mini-value ' + scoreClass + '">' + (score || '—') + '</div></div>';
+    cardsHtml += '<div class="client-mini-metric"><div class="client-mini-label">Errores 404</div><div class="client-mini-value ' + err404Class + '">' + errores404 + '</div></div>';
+    cardsHtml += '<div class="client-mini-metric"><div class="client-mini-label">URLs Sitemap</div><div class="client-mini-value">' + (urlsSitemap || '—') + '</div></div>';
+    cardsHtml += '<div class="client-mini-metric"><div class="client-mini-label">Indexadas</div><div class="client-mini-value">' + (indexadas || '—') + '</div></div>';
+    cardsHtml += '<div class="client-mini-metric"><div class="client-mini-label">No Indexadas</div><div class="client-mini-value ' + (noIndexadas > 0 ? 'warn' : 'ok') + '">' + noIndexadas + '</div></div>';
+    cardsHtml += '</div>';
+    cardsHtml += '<div class="client-card-actions">';
+    cardsHtml += '<button class="client-card-btn view" onclick="selectClient(\'' + cleanClient + '\')">👁 Ver datos</button>';
+    cardsHtml += '<button class="client-card-btn report" onclick="generateReportForClient(\'' + cleanClient + '\', this)">✨ Generar informe</button>';
+    cardsHtml += '</div></div>';
   });
 
-  el.innerHTML = \`
-    <div class="launch-card">
-      <h2>🚀 Nueva auditoría</h2>
-      <p>Introduce el dominio del cliente y lanza los agentes de análisis</p>
-      <div class="launch-input-row">
-        <input type="text" class="launch-input" id="agentDomain" placeholder="dominio.com">
-        <button class="launch-btn white" onclick="runAllAgents()">⚡ Ejecutar todos</button>
-        <button class="launch-btn outline-white" onclick="runAgent('tecnica', document.getElementById('agentDomain').value)">Técnica</button>
-        <button class="launch-btn outline-white" onclick="runAgent('cobertura', document.getElementById('agentDomain').value)">Cobertura</button>
-        <button class="launch-btn outline-white" onclick="runAgent('semrush', document.getElementById('agentDomain').value)">Semrush</button>
-        <button class="launch-btn outline-white" onclick="runAgent('onpage', document.getElementById('agentDomain').value)">On-Page</button>
-        <button class="launch-btn outline-white" onclick="runAgent('enlaces', document.getElementById('agentDomain').value)">Enlaces</button>
-      </div>
-      <div class="tools-row">
-        <button class="launch-btn outline-white" onclick="window.open('${DRIVE_FOLDER}', '_blank')">📂 Carpeta Screaming Frog</button>
-        <button class="launch-btn outline-white" onclick="window.open('${GAMMA_URL}', '_blank')">🔗 Ver informes en Gamma</button>
-      </div>
-    </div>
+  let html = '<div class="launch-card">';
+  html += '<h2>🚀 Nueva auditoría</h2>';
+  html += '<p>Introduce el dominio del cliente y lanza los agentes de análisis</p>';
+  html += '<div class="launch-input-row">';
+  html += '<input type="text" class="launch-input" id="agentDomain" placeholder="dominio.com">';
+  html += '<button class="launch-btn white" onclick="runAllAgents()">⚡ Ejecutar todos</button>';
+  html += '<button class="launch-btn outline-white" onclick="runAgent(\'tecnica\', document.getElementById(\'agentDomain\').value)">Técnica</button>';
+  html += '<button class="launch-btn outline-white" onclick="runAgent(\'cobertura\', document.getElementById(\'agentDomain\').value)">Cobertura</button>';
+  html += '<button class="launch-btn outline-white" onclick="runAgent(\'semrush\', document.getElementById(\'agentDomain\').value)">Semrush</button>';
+  html += '<button class="launch-btn outline-white" onclick="runAgent(\'onpage\', document.getElementById(\'agentDomain\').value)">On-Page</button>';
+  html += '<button class="launch-btn outline-white" onclick="runAgent(\'enlaces\', document.getElementById(\'agentDomain\').value)">Enlaces</button>';
+  html += '</div>';
+  html += '<div class="tools-row">';
+  html += '<button class="launch-btn outline-white" onclick="window.open(DRIVE_FOLDER, \'_blank\')">📂 Carpeta Screaming Frog</button>';
+  html += '<button class="launch-btn outline-white" onclick="window.open(GAMMA_URL, \'_blank\')">🔗 Ver informes en Gamma</button>';
+  html += '</div></div>';
 
-    \${clients.size > 0 ? \`
-    <div class="home-section-title">📊 Clientes auditados <span style="font-size:13px;font-weight:500;color:var(--surface-400);margin-left:8px;">\${clients.size} clientes</span></div>
-    <div class="clients-grid">\${cardsHtml}</div>
-    \` : '<div class="no-data">Aún no hay datos de clientes. Lanza tu primera auditoría arriba.</div>'}
+  if (clients.size > 0) {
+    html += '<div class="home-section-title">📊 Clientes auditados <span style="font-size:13px;font-weight:500;color:var(--surface-400);margin-left:8px;">' + clients.size + ' clientes</span></div>';
+    html += '<div class="clients-grid">' + cardsHtml + '</div>';
+  } else {
+    html += '<div class="no-data">Aún no hay datos de clientes. Lanza tu primera auditoría arriba.</div>';
+  }
 
-    <div style="display:none">
-      <span id="dot-tecnica"></span><span id="msg-tecnica"></span>
-      <span id="dot-cobertura"></span><span id="msg-cobertura"></span>
-      <span id="dot-semrush"></span><span id="msg-semrush"></span>
-      <span id="dot-onpage"></span><span id="msg-onpage"></span>
-      <span id="dot-enlaces"></span><span id="msg-enlaces"></span>
-    </div>
-  \`;
+  html += '<div style="display:none"><span id="dot-tecnica"></span><span id="msg-tecnica"></span><span id="dot-cobertura"></span><span id="msg-cobertura"></span><span id="dot-semrush"></span><span id="msg-semrush"></span><span id="dot-onpage"></span><span id="msg-onpage"></span><span id="dot-enlaces"></span><span id="msg-enlaces"></span></div>';
+
+  el.innerHTML = html;
 }
 
 function selectClient(client) {
@@ -1227,14 +1199,13 @@ function selectClient(client) {
   switchTab('tecnica');
 }
 
-async function generateReportForClient(domain) {
-  const btn = event.target;
+async function generateReportForClient(domain, btn) {
   btn.disabled = true;
   btn.textContent = '⏳ Generando...';
   try {
-    await fetch(\`\${WEBHOOKS.slides}?domain=\${encodeURIComponent(domain)}\`, { mode: 'no-cors' });
+    await fetch(WEBHOOKS.slides + '?domain=' + encodeURIComponent(domain), { mode: 'no-cors' });
     btn.textContent = '✓ En proceso';
-    setTimeout(() => { btn.disabled = false; btn.textContent = '✨ Generar informe'; }, 5000);
+    setTimeout(function() { btn.disabled = false; btn.textContent = '✨ Generar informe'; }, 5000);
   } catch(e) {
     btn.disabled = false;
     btn.textContent = '✨ Generar informe';
